@@ -1,25 +1,76 @@
-import { Box, Button, Container, HStack, VStack } from '@chakra-ui/react';
 import Head from 'next/head';
 import Link from 'next/link';
+import {
+  Box,
+  Heading,
+  Button,
+  Container,
+  useDisclosure,
+  HStack,
+  Stack,
+  Spacer,
+  VStack,
+  Grid,
+} from '@chakra-ui/react';
+import { HamburgerIcon } from '@chakra-ui/icons';
 
-function NavItem({ href, children }) {
-  return (
-    <Link href={href} passHref>
-      <Button as="a" variant="link" size="lg">
-        {children}
-      </Button>
-    </Link>
-  );
-}
+const MenuItem = ({ href, children, ...props }) => (
+  <Link href={href} passHref>
+    <Button as="a" variant="link" {...props}>
+      {children}
+    </Button>
+  </Link>
+);
 
 function Header() {
+  const { isOpen, onToggle } = useDisclosure();
+
   return (
-    <Box bg="purple.500" py={4}>
+    <Box bg="purple.500">
       <Container>
-        <HStack justify="space-between">
-          <NavItem href="/">Home</NavItem>
-          <NavItem href="/search">Search</NavItem>
-        </HStack>
+        <Stack
+          as="nav"
+          direction={['column', , 'row']}
+          justify="space-between"
+          wrap="wrap"
+          py="1.5rem"
+        >
+          <HStack justify="space-between">
+            <MenuItem href="/" mr={8}>
+              <Heading size="lg">Movies DB</Heading>
+            </MenuItem>
+
+            <Box display={['block', , 'none']} onClick={onToggle}>
+              <Button variant="outline">
+                <HamburgerIcon />
+              </Button>
+            </Box>
+          </HStack>
+
+          <Stack
+            direction={['column', , 'row']}
+            justify="start"
+            align={['start', , 'center']}
+            display={[isOpen ? 'flex' : 'none', , 'flex']}
+            spacing={4}
+          >
+            <MenuItem href="/search">Search</MenuItem>
+            <MenuItem href="/" disabled>
+              Watchlist
+            </MenuItem>
+            <MenuItem href="/" disabled>
+              History
+            </MenuItem>
+          </Stack>
+
+          <Spacer />
+
+          <Box display={[isOpen ? 'block' : 'none', , 'block']}>
+            <MenuItem href="/" variant="outline" disabled>
+              What to watch
+            </MenuItem>
+          </Box>
+        </Stack>
       </Container>
     </Box>
   );
@@ -29,12 +80,17 @@ export default function Layout({ title, children }) {
   return (
     <>
       <Head>
-        <title>{title}</title>
+        {title && <title>{title}</title>}
+        <link rel="icon" href="/favicon.ico" />
       </Head>
-      <VStack align="stretch">
-        <Header />
-        <Box as="main">{children}</Box>
-      </VStack>
+      <Grid minH="100vh">
+        <VStack w="full" align="stretch" spacing={8}>
+          <Header />
+          <Box as="main" h="full">
+            {children}
+          </Box>
+        </VStack>
+      </Grid>
     </>
   );
 }
